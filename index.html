@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Raytracer</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="grid-container">
+        <div class="grid-item grid-item-1">
+            <div class="status-div">
+                <h1 class="status" id="status">RENDERING SCENE...</h1>
+            </div>
+        </div>
+
+        <div class="grid-item">
+
+        </div>
+
+        <div class="grid-item grid-item-2">
+            <canvas id="canvas" width="800" height="600">
+                Your browser does not support the HTML canvas tag.
+            </canvas>
+        </div>
+
+        <div class="grid-item grid-item-3">
+            <div class="upload-area">
+                <div class="upload-box" id="drop_zone" ondrop="dropHandler(event);"
+                    ondragover="dragOverHandler(event);">
+                    <p>Upload an OBJ file.</p>
+                    <input type="file" id="myFile" name="filename" onchange="uploadFile(event)">
+                </div>
+
+                <div class="object-container" id="object-container">
+                    <div id="object-item-0">
+                        <button type="button" id="0" class="object-button object-dropdown"
+                            onclick="objectDropdown(this)">➤
+                            Sphere</button>
+                    </div>
+                </div>
+
+                <button class="generate-button" onclick="generate()">Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="raytracer.js"></script>
+</body>
+
+</html>
