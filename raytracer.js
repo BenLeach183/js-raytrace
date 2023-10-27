@@ -954,8 +954,13 @@ const c = document.getElementById("canvas");                                    
 const ctx = c.getContext("2d", { willReadFrequently: true });                                           //
                                                                                                         //
 const statusText = document.getElementById("status");                                                   //
+const genButton = document.getElementById("generate-button");                                           //
 let startTime;                                                                                          //
 let renderTime;                                                                                         //
+                                                                                                        //
+// Allow rendering to be stopped                                                                        //
+let interrupted = false;                                                                                //
+let generating = false;                                                                                 //
                                                                                                         //
 // Variables to render in chunks, frame keeps track of current chunk.                                   //
 let chunkWidth = 6;                                                                                     //
@@ -969,6 +974,19 @@ chunkAspect = Math.ceil(chunkAspect / chunkWidth);                              
                                                                                                         //
 // Function to be called to start generating the image.                                                 // MAIN
 function generate() {                                                                                   //
+    if (generating && !interrupted) {                                                                   //
+        interrupted = true;                                                                             //
+        genButton.innerHTML = "Generate";                                                               //  
+        return;                                                                                         //
+    }                                                                                                   //
+                                                                                                        //
+    if(interrupted)  {                                                                                  //
+        interrupted = false;                                                                            //
+    }                                                                                                   //
+                                                                                                        //
+    genButton.innerHTML = "Interrupt";                                                                  //
+                                                                                                        //
+    generating = true;                                                                                  //
     startTime = new Date().getTime();                                                                   //
                                                                                                         //
     // Clear the object arrays.                                                                         //
@@ -1009,6 +1027,12 @@ function render() {                                                             
             colour = rayColour(ray).scale(255);                                                         //
                                                                                                         // MAIN
             setPixel(i, j, colour);                                                                     //
+                                                                                                        //
+            if(interrupted) {                                                                           //
+                statusText.innerHTML = `Stopped at ${Math.round((new Date().getTime() - startTime) / 10) /100}s`;
+                frame = 0;                                                                              //
+                return;                                                                                 //
+            }                                                                                           //
         }                                                                                               //
     }                                                                                                   //
                                                                                                         //
@@ -1079,6 +1103,7 @@ function estimateTime() {                                                       
     // aliasSamples**2 = number of rays per pixel                                                       //
     statusText.innerHTML = `ANTI_ALIASING... [Estimated ${Math.round((aliasPixels.size * aliasSamples**2 * timePerRay) * 1.3 / 10) / 100}s]`;
                                                                                                         //
+    genButton.disabled = true;
     window.requestAnimationFrame(function () {                                                          //
         antialias(aliasSamples);                                                                        //
     });                                                                                                 //
@@ -1102,9 +1127,15 @@ function antialias(aliasSamples) {                                              
         colour = colour.scale(1 / (aliasSamples * aliasSamples)).scale(255);                            //
                                                                                                         //
         setPixel(pixels[0], pixels[1], colour);                                                         //
-    }                                                                                                   //
+    }                                                                                                   //                                                                                        //
+    window.requestAnimationFrame(finished)                                                              //
+}                                                                                                       //
                                                                                                         //
+function finished() {                                                                                   //
     statusText.innerHTML = `Finished in ${Math.round((new Date().getTime() - startTime) / 10) /100}s`;  //
+    genButton.innerHTML = "Generate";                                                                   //
+    genButton.disabled = false;                                                                         //
+    generating = false;                                                                                 //
 }                                                                                                       //
                                                                                                         //
 generate();                                                                                             //
